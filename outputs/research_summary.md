@@ -26,7 +26,7 @@ The current workspace contains 500 sampled files across clawflow, applications, 
 
 ClawFlow is a lightweight **Agent Runtime / AgentOS Kernel** prototype for building next-generation personal AI agents. It is not a ChatGPT API wrapper and not a folder of isolated demo scripts. It provides a reusable infrastructure layer for **Workflow Orchestration**, **Checkpoint & Resume**, **Tool Sandbox**, **Permission Governance**, **Memory Layer**, **Observability**, **Trace Replay**, **Plugin Registry**, **MCP-like Connector**, **RAG Module**, **Event Bus**, **Scheduler**, **Benchmark & Evaluation**, and **Multi-agent Collaboration**.
 
-![Architecture](docs/assets/diagrams/architecture.png)
+![Architecture](../docs/assets/diagrams/architecture.png)
 
 ## Repository Status
 

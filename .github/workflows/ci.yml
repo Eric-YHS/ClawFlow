@@ -56,3 +56,30 @@ jobs:
 
       - name: Verify deliverable completeness
         run: python -m scripts.verify_deliverables
+
+      - name: Check markdown links resolve
+        run: |
+          python3 - <<'PY'
+          import re, sys
+          from pathlib import Path
+
+          # markdown inline links / images: [text](dest) or ![alt](dest)
+          link = re.compile(r'!?(?:\[[^\]]*\])\(([^)\s]+)')
+          skip_dirs = {'node_modules', '.next', '.venv', 'site-packages', '.git'}
+          bad = []
+          for md in sorted(Path('.').rglob('*.md')):
+              if skip_dirs.intersection(md.parts):
+                  continue
+              for m in link.finditer(md.read_text(encoding='utf-8', errors='replace')):
+                  dest = m.group(1).strip().split('#')[0]
+                  if not dest or dest.startswith(('http://', 'https://', 'mailto:', 'data:')):
+                      continue
+                  if not (md.parent / dest).resolve().exists():
+                      bad.append(f'{md}: {dest}')
+          if bad:
+              print('Broken relative markdown links:')
+              print('\n'.join(bad))
+              sys.exit(1)
+          print('ok  all relative markdown links resolve')
+          PY
+
