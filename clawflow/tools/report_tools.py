@@ -18,6 +18,30 @@ def _write(path: Path, content: str) -> Path:
     return path
 
 
+_LINK = re.compile(r"(!?\[[^\]]*]\()([^)\s]+)(\))")
+
+
+def _rebase_relative_links(markdown: str, root: Path, depth: int = 1) -> str:
+    """把相对仓库根目录写的 markdown 链接改成相对生成文档所在的目录。
+
+    项目摘要里直接嵌了 README 原文，README 里的图片路径是相对仓库根目录的
+    （docs/assets/...）。同样的文字写进 outputs/research_summary.md 后，这些链接
+    指向的就是不存在的 outputs/docs/...，CI 的 markdown 链接检查会报错。
+    只改「相对根目录确实存在」的目标，已经是 ../ 或外链的不动。
+    """
+    prefix = "../" * depth
+
+    def rewrite(match: re.Match[str]) -> str:
+        dest = match.group(2)
+        if dest.startswith(("http://", "https://", "mailto:", "data:", "#", "/", "../", "./", prefix)):
+            return match.group(0)
+        if not (root / dest.split("#", 1)[0]).exists():
+            return match.group(0)
+        return f"{match.group(1)}{prefix}{dest}{match.group(3)}"
+
+    return _LINK.sub(rewrite, markdown)
+
+
 def _workspace_overview(root: Path, max_files: int = 300) -> dict[str, Any]:
     ignore = {".git", ".venv", "__pycache__", ".pytest_cache", "node_modules"}
     files: list[str] = []
@@ -128,6 +152,8 @@ class GenerateProjectSummaryTool(BaseTool):
         overview = _workspace_overview(root, max_files=500)
         readme = root / "README.md"
         readme_text = readme.read_text(encoding="utf-8", errors="ignore")[:2500] if readme.exists() else ""
+        # 摘要写在 outputs/ 下，嵌进来的 README 片段要按这个目录重算相对链接
+        readme_text = _rebase_relative_links(readme_text, root=root)
         source_dirs = [p for p in ["clawflow", "applications", "docs", "scripts", "tests"] if (root / p).exists()]
         summary = [
             "# Research Summary",
