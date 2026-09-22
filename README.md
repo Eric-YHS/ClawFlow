@@ -1,5 +1,8 @@
 # ClawFlow
 
+![CI](https://img.shields.io/github/actions/workflow/status/Eric-YHS/ClawFlow/ci.yml?branch=main&logo=githubactions&logoColor=white&label=CI)
+![License](https://img.shields.io/badge/license-Apache--2.0-blue)
+
 **A Lightweight Agent Runtime for Next-Generation Personal AI Agents**
 
 > 让智能体从能回答走向能执行、能记忆、能恢复、能协作、能治理。

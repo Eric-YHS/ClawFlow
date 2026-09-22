@@ -6,6 +6,14 @@ on:
   pull_request:
     branches: [main]
 
+# 只读令牌；同一分支上新的 push 取消还在跑的旧任务
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-and-artifacts:
     runs-on: ubuntu-latest
